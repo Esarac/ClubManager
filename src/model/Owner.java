@@ -31,18 +31,15 @@ public class Owner{
 		String message="Se ha agregado la mascota \""+name+"\".";
 		boolean exist=false;
 		
-		for(int i=0; (i<pets.size()) && !exist; i++){//?? colocar un try catch por si es null (Mala practica colocar un catch vacio?)
-			try{
-				if(pets.get(i).getName().equals(name)){
-					message="La mascota con nombre \""+name+"\" ya existe.";
-					exist=true;
-				}
+		for(int i=0; (i<pets.size()) && !exist; i++){
+			if(pets.get(i).getName().equals(name)){
+				message="La mascota con nombre \""+name+"\" ya existe.";
+				exist=true;
 			}
-			catch(NullPointerException e){}
 		}
 		
 		if(!exist){
-			pets.add(new Pet(id, name, birthdate, gender, type));//?? Mala practica colocar el new de una?
+			pets.add(new Pet(id, name, birthdate, gender, type));
 		}
 		
 		return message;

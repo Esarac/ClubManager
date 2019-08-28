@@ -29,7 +29,7 @@ public class Club{
 		String message="Se ha agregado el dueno \""+name+"\".";
 		boolean exist=false;
 		
-		for(int i=0; (i<owners.size()) && !exist; i++){//?? colocar un try catch por si es null (Mala practica colocar un catch vacio?)
+		for(int i=0; (i<owners.size()) && !exist; i++){
 			if(owners.get(i).getId().equals(id)){
 				message="El dueno con id \""+id+"\" ya existe.";
 				exist=true;
@@ -37,22 +37,7 @@ public class Club{
 		}
 		
 		if(!exist){
-			owners.add(new Owner(id, name, lastName, birthdate, favoritePetType));//?? Mala practica colocar el new de una?
-		}
-		
-		return message;
-		
-	}
-	
-	public String addPet(String ownerId, String id, String name, String birthdate, char gender, String type){
-		
-		String message="El dueno con id \""+ownerId+"\" no existe.";
-		boolean found=false;
-		
-		for(int i=0; (i<owners.size()) && !found; i++){
-			if(owners.get(i).getId().equals(ownerId)){
-				message=owners.get(i).addPet(id, name, birthdate, gender, type);
-			}
+			owners.add(new Owner(id, name, lastName, birthdate, favoritePetType));
 		}
 		
 		return message;
@@ -72,5 +57,10 @@ public class Club{
 		
 	}
 	
+	public ArrayList<Owner> getOwners(){
+		
+		return owners;
+		
+	}
 	
 }
