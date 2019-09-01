@@ -1,18 +1,28 @@
 package model;
 
 import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class ClubManager{
 	
 	//Attributes
-	private ArrayList<Club> clubs;
 	private Club actualClub;
 	private Owner actualOwner;
+	private ArrayList<Club> clubs;
+	
 	
 	//Constructor
 	public ClubManager(){
 		
+		this.actualClub=null;
+		this.actualOwner=null;
+		
 		this.clubs=new ArrayList<Club>();
+		loadClubs();
 		
 	}
 	
@@ -52,6 +62,30 @@ public class ClubManager{
 		
 		String message=actualOwner.addPet(id, name, birthdate, gender, type);
 		return message;
+		
+	}
+	
+	//Load
+	public void loadClubs(){
+		try{//Buenas practicas
+			File info=new File("info/");
+			String[] folders=info.list();
+			for(int i=0; i<folders.length; i++){
+				File club=new File("info/"+folders[i]+"/"+folders[i]+".txt");
+				
+				FileReader fr=new FileReader(club);
+				BufferedReader reader= new BufferedReader(fr);
+				String[] variable=new String[4];
+				for(int j=0; j<variable.length; j++){
+					variable[j]=reader.readLine();
+				}
+				addClub(variable[0], variable[1], variable[2], variable[3]);
+				reader.close();
+				
+			}
+		}
+		catch(FileNotFoundException e){e.printStackTrace();}
+		catch(IOException e){e.printStackTrace();}
 		
 	}
 	
@@ -98,6 +132,7 @@ public class ClubManager{
 	}
 	
 	public void setActualOwnerNull(){
+		actualClub.saveOwners();
 		this.actualOwner=null;
 	}
 	

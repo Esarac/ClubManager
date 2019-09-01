@@ -1,8 +1,9 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Owner{
+public class Owner implements Serializable{
 	
 	//Attributes
 	private String id;
