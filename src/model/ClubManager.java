@@ -3,17 +3,20 @@ package model;
 import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 public class ClubManager{
+	
+	//Constants
+	public static final String FILE_TYPE=".al";
+	public static final String CLUBS_PATH="info/clubs.txt";
 	
 	//Attributes
 	private Club actualClub;
 	private Owner actualOwner;
 	private ArrayList<Club> clubs;
-	
 	
 	//Constructor
 	public ClubManager(){
@@ -26,8 +29,198 @@ public class ClubManager{
 		
 	}
 	
+	//Add
+	public String addClub(String id, String name, String creationDate, String petType){
+		
+		String message="Se ha agregado el club \""+name+"\".";
+		boolean exist=false;
+		
+		for(int i=0; (i<clubs.size()) && !exist; i++){
+			if(clubs.get(i).getId().equals(id)){
+				message="El club con id \""+id+"\" ya existe.";
+				exist=true;
+			}
+			else if(clubs.get(i).getName().equals(name)){
+				message="El club con nombre \""+name+"\" ya existe.";
+				exist=true;
+			}
+		}
+		if(!exist){
+			Club club=new Club(id, name, creationDate, petType);
+			clubs.add(club);
+			club.saveClub();
+		}
+		
+		return message;
+		
+	}
+	
+	public String addOwner(String id, String name, String lastName, String birthdate, String favoritePetType){//[Call]
+		
+		String message=actualClub.addOwner(id, name, lastName, birthdate, favoritePetType);
+		return message;
+		
+	}
+	
+	public String addPet(String id, String name, String birthdate, char gender, String type){//[Call]
+		
+		String message=actualOwner.addPet(id, name, birthdate, gender, type);
+		return message;
+		
+	}
+	
+	//Delete
+	private String deleteClubId(String id){
+		
+		String message="El club con id \""+id+"\" no existe.";
+		boolean found=false;
+		
+		for(int i=0; (i<clubs.size()) && !found; i++){
+			if(clubs.get(i).getId().equals(id)){
+				deleteClubFile(id);
+				clubs.remove(i);
+				message="Eliminaste el club con id \""+id+"\".";
+				found=true;
+			}
+		}
+		
+		return message;
+		
+	}
+	
+	private String deleteClubName(String name){
+		
+		String message="El club con nombre \""+name+"\" no existe.";
+		boolean found=false;
+		
+		for(int i=0; (i<clubs.size()) && !found; i++){
+			if(clubs.get(i).getName().equals(name)){
+				String id=clubs.get(i).getId();
+				deleteClubFile(id);
+				clubs.remove(i);
+				message="Eliminaste el club con nombre \""+name+"\".";
+				found=true;
+			}
+		}
+		
+		return message;
+		
+	}
+	
+	private void deleteClubFile(String id){//[File]
+		
+		try{
+			File clubs=new File(CLUBS_PATH);
+			
+			String newText="";
+			String text=readClubs();
+			String[] clubsData=text.split("\r");
+			for(String clubData: clubsData){
+				String[] data=clubData.split(",");
+				if(!data[0].equals(id)){
+					newText+=clubData+"\r";
+				}
+			}
+			
+			File[] als=(new File("info/")).listFiles();
+			for(File al: als){
+				if(al.getName().equals(id+FILE_TYPE)){
+					al.delete();
+				}
+			}
+			
+			PrintWriter writer=new PrintWriter(clubs);
+			writer.append(newText);
+			writer.close();
+		}
+		catch(IOException e){e.printStackTrace();}
+		
+	}
+	
+	public String deleteClub(String info, int type){//[Call]
+		
+		String message="Tipo de busqueda invalido.";
+		switch(type){
+			case 1:
+				message=deleteClubId(info);
+			break;
+			case 2:
+				message=deleteClubName(info);
+			break;
+		}
+		return message;
+		
+	}
+	
+	public String deleteOwner(String info, int type){//[Call]
+		
+		String message="Tipo de busqueda invalido.";
+		switch(type){
+			case 1:
+				message=actualClub.deleteOwnerId(info);
+			break;
+			case 2:
+				message=actualClub.deleteOwnerName(info);
+			break;
+		}
+		return message;
+		
+	}
+	
+	public String deletePet(String info, int type){//[Call]
+		
+		String message="Tipo de busqueda invalido.";
+		switch(type){
+			case 1:
+				message=actualOwner.deletePetId(info);
+			break;
+			case 2:
+				message=actualOwner.deletePetName(info);
+			break;
+		}
+		return message;
+		
+	}
+	
+	//Load
+	private void loadClubs(){//[File]
+		
+		try{
+			String text=readClubs();
+			String[] clubsData=text.split("\r");
+			for(String clubData: clubsData){
+				String[] data=clubData.split(",");
+				if(data.length!=1){
+					clubs.add(new Club(data[0],data[1],data[2],data[3]));
+				}
+			}
+		}
+		catch(IOException e){e.printStackTrace();}
+		catch(IndexOutOfBoundsException e){e.printStackTrace();}
+		
+	}
+	
+	//Read
+	public static String readClubs() throws IOException{//[File]//Buena practica???
+		
+		File dir=new File("info//");
+		dir.mkdir();
+		File clubs=new File(ClubManager.CLUBS_PATH);
+		clubs.createNewFile();
+		FileReader fileReader=new FileReader(clubs);
+		BufferedReader reader=new BufferedReader(fileReader);
+		String actualLine;
+		String text="";
+		while((actualLine=reader.readLine())!=null){
+			text+=actualLine+"\r";
+		}
+		reader.close();
+		return text;
+		
+	}
+	
 	//Show
-	public String showClubsReport(int type){
+	public String showClubsReport(int type){//Call??//Cuando esta vacio lo muestro??
 		
 		String report="Clubes ordenados por ";
 		boolean okay=true;
@@ -41,6 +234,9 @@ public class ClubManager{
 				nameSort();
 			break;
 			case 3:
+				
+				report+="fecha de creacion:";
+				creationDateSort();
 				
 			break;
 			case 4:
@@ -65,7 +261,7 @@ public class ClubManager{
 		
 	}
 	
-	public String showOwnersReport(int type){
+	public String showOwnersReport(int type){//[Call]
 		
 		String message;
 		try{message=actualClub.showOwnersReport(type);}
@@ -74,7 +270,7 @@ public class ClubManager{
 		
 	}
 	
-	public String showPetsReport(int type){
+	public String showPetsReport(int type){//[Call]
 		
 		String message;
 		try{message=actualOwner.showPetsReport(type);}
@@ -83,134 +279,8 @@ public class ClubManager{
 		
 	}
 	
-	//Add
-	public String addClub(String id, String name, String creationDate, String petType){
-		
-		String message="Se ha agregado el club \""+name+"\".";
-		boolean exist=false;
-		
-		for(int i=0; (i<clubs.size()) && !exist; i++){
-			if(clubs.get(i).getId().equals(id)){
-				message="El club con id \""+id+"\" ya existe.";
-				exist=true;
-			}
-			else if(clubs.get(i).getName().equals(name)){
-				message="El club con nombre \""+name+"\" ya existe.";
-				exist=true;
-			}
-		}
-		
-		if(!exist){
-			clubs.add(new Club(id, name, creationDate, petType));
-		}
-		
-		return message;
-		
-	}
-	
-	public String addOwner(String id, String name, String lastName, String birthdate, String favoritePetType){
-		
-		String message=actualClub.addOwner(id, name, lastName, birthdate, favoritePetType);
-		return message;
-		
-	}
-	
-	public String addPet(String id, String name, String birthdate, char gender, String type){
-		
-		String message=actualOwner.addPet(id, name, birthdate, gender, type);
-		return message;
-		
-	}
-	
-	//Delete
-	public String deleteClubId(String id){
-		String message="El club con id \""+id+"\" no existe.";
-		boolean found=false;
-		
-		for(int i=0; (i<clubs.size()) && !found; i++){
-			if(clubs.get(i).getId().equals(id)){
-				deleteClubFile(id);
-				clubs.remove(i);
-				message="Eliminaste el club con id \""+id+"\".";
-				found=true;
-			}
-		}
-		
-		return message;
-	}
-	
-	public String deleteClubName(String name){
-		String message="El club con nombre \""+name+"\" no existe.";
-		boolean found=false;
-		
-		for(int i=0; (i<clubs.size()) && !found; i++){
-			if(clubs.get(i).getName().equals(name)){
-				String id=clubs.get(i).getId();
-				deleteClubFile(id);
-				clubs.remove(i);
-				message="Eliminaste el club con nombre \""+name+"\".";
-				found=true;
-			}
-		}
-		
-		return message;
-	}
-	
-	private void deleteClubFile(String id){
-		
-		File info=new File("info/");
-		String[] folders=info.list();
-		
-		boolean found=false;
-		for(int i=0; (i<folders.length) && !found; i++){
-			if(folders[i].equals(id)){
-				File club=new File("info/"+folders[i]);
-				
-				String[] files=club.list();
-				for(int j=0; j<files.length; j++){
-					File file=new File("info/"+folders[i]+"/"+files[j]);
-					file.delete();
-				}
-				
-				club.delete();
-				found=true;
-			}
-		}
-		
-	}
-	
-	public String deleteOwner(String info, int type){
-		
-		String message="Tipo de busqueda invalido.";
-		switch(type){
-			case 1:
-				message=actualClub.deleteOwnerId(info);
-			break;
-			case 2:
-				message=actualClub.deleteOwnerName(info);
-			break;
-		}
-		return message;
-		
-	}
-	
-	public String deletePet(String info, int type){
-		
-		String message="Tipo de busqueda invalido.";
-		switch(type){
-			case 1:
-				message=actualOwner.deletePetId(info);
-			break;
-			case 2:
-				message=actualOwner.deletePetName(info);
-			break;
-		}
-		return message;
-		
-	}
-	
-	//Sorting
-	public void idSort(){
+	//Sort
+	private void idSort(){
 		
 		for(int i=0; i<clubs.size(); i++){
 			Club min=clubs.get(i);
@@ -228,7 +298,7 @@ public class ClubManager{
 		
 	}
 	
-	public void nameSort(){
+	private void nameSort(){
 		
 		for(int i=0; i<clubs.size(); i++){
 			Club min=clubs.get(i);
@@ -246,7 +316,25 @@ public class ClubManager{
 		
 	}
 	
-	public void petTypeSort(){
+	private void creationDateSort(){
+		
+		for(int i=0; i<clubs.size(); i++){
+			Club min=clubs.get(i);
+			int minPos=i;
+			for(int j=i+1; j<clubs.size(); j++){
+				if(clubs.get(j).compareCreationDate(min)<0){
+					min=clubs.get(j);
+					minPos=j;
+				}
+			}
+			Club actual=clubs.get(i);
+			clubs.set(i, min);
+			clubs.set(minPos, actual);
+		}
+		
+	}
+	
+	private void petTypeSort(){
 		
 		for(int i=0; i<clubs.size(); i++){
 			Club min=clubs.get(i);
@@ -264,7 +352,7 @@ public class ClubManager{
 		
 	}
 	
-	public void ownerQuantitySort(){
+	private void ownerQuantitySort(){
 		
 		for(int i=0; i<clubs.size(); i++){
 			Club min=clubs.get(i);
@@ -284,40 +372,20 @@ public class ClubManager{
 	
 	//Check
 	public boolean inClub(){
+		
 		boolean exist=true;
 		if(actualClub==null)
 			exist=false;
 		return exist;
+		
 	}
 	
 	public boolean inOwner(){
+		
 		boolean exist=true;
 		if(actualOwner==null)
 			exist=false;
 		return exist;
-	}
-	
-	//Load
-	public void loadClubs(){
-		try{//Buenas practicas
-			File info=new File("info/");
-			String[] folders=info.list();
-			for(int i=0; i<folders.length; i++){
-				File club=new File("info/"+folders[i]+"/"+folders[i]+".txt");
-				
-				FileReader fr=new FileReader(club);
-				BufferedReader reader= new BufferedReader(fr);
-				String[] variable=new String[4];
-				for(int j=0; j<variable.length; j++){
-					variable[j]=reader.readLine();
-				}
-				addClub(variable[0], variable[1], variable[2], variable[3]);
-				reader.close();
-				
-			}
-		}
-		catch(FileNotFoundException e){e.printStackTrace();}
-		catch(IOException e){e.printStackTrace();}
 		
 	}
 	
@@ -350,7 +418,10 @@ public class ClubManager{
 	}
 	
 	public void setActualClubNull(){
+		
+		this.actualOwner=null;
 		this.actualClub=null;
+		
 	}
 	
 	public String setActualOwner(String id){//Este deberia repartirlo en las diferentes clases?
@@ -386,8 +457,11 @@ public class ClubManager{
 	}
 	
 	public void setActualOwnerNull(){
-		actualClub.saveOwners();
+		
+		try{actualClub.saveOwners();}
+		catch(NullPointerException e){e.printStackTrace();}
 		this.actualOwner=null;
+		
 	}
 	
 }

@@ -1,17 +1,26 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
+import java.util.Date;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class Club implements Comparable<Club>, Comparator<Club>{
+	
+	//Constant
+	public static final String FILE_TYPE=".al";
 	
 	//Attributes
 	private String id;
@@ -29,14 +38,111 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 		this.petType=petType;
 		
 		this.owners=new ArrayList<Owner>();
-		
-		saveClub();
 		loadOwners();
 		
 	}
 	
+	//Add
+	public String addOwner(String id, String name, String lastName, String birthdate, String favoritePetType){//Tambien verificar que no tengan el mismo nombre???
+		
+		String message="Se ha agregado el dueno \""+name+"\".";
+		boolean exist=false;
+		
+		for(int i=0; (i<owners.size()) && !exist; i++){
+			if(owners.get(i).getId().equals(id)){
+				message="El dueno con id \""+id+"\" ya existe.";
+				exist=true;
+			}
+		}
+		if(!exist){
+			owners.add(new Owner(id, name, lastName, birthdate, favoritePetType));
+			saveOwners();
+		}
+		
+		return message;
+		
+	}
+	
+	//Delete
+	public String deleteOwnerId(String id) {
+		
+		String message="El dueno con id \""+id+"\" no existe.";
+		boolean found=false;
+		
+		for(int i=0; (i<owners.size()) && !found; i++){
+			if(owners.get(i).getId().equals(id)){
+				owners.remove(i);
+				saveOwners();
+				message="Eliminaste el dueno con id \""+id+"\".";
+				found=true;
+			}
+		}
+		
+		return message;
+		
+	}
+	
+	public String deleteOwnerName(String name) {
+		
+		String message="El dueno con nombre \""+name+"\" no existe.";
+		boolean found=false;
+		
+		for(int i=0; (i<owners.size()) && !found; i++){
+			if(owners.get(i).getName().equals(name)){
+				owners.remove(i);
+				saveOwners();
+				message="Eliminaste el dueno con nombre \""+name+"\".";
+				found=true;
+			}
+		}
+		
+		return message;
+		
+	}
+	
+	//Save
+	public void saveClub(){//[File]
+		
+		try{
+			File clubs=new File(ClubManager.CLUBS_PATH);
+			String text=ClubManager.readClubs();
+			text+=id+","+name+","+creationDate+","+petType;
+			PrintWriter writer=new PrintWriter(clubs);
+			writer.append(text);
+			writer.close();
+		}
+		catch (IOException e) {e.printStackTrace();}
+		
+	}
+	
+	public void saveOwners(){//[File]
+		
+		try {
+			FileOutputStream file=new FileOutputStream("info/"+id+ClubManager.FILE_TYPE);
+			ObjectOutputStream creator=new ObjectOutputStream(file);
+			creator.writeObject(owners);
+			creator.close();
+		}
+		catch (IOException e) {e.printStackTrace();}
+		
+	}
+	
+	//Load
+	private void loadOwners(){//[File]
+		
+		try{
+			FileInputStream owners=new FileInputStream("info/"+id+FILE_TYPE);
+			ObjectInputStream creator=new ObjectInputStream(owners);
+			this.owners=(ArrayList<Owner>)creator.readObject();//Trate de hacer un instanceof???
+			creator.close();
+		}
+		catch (IOException e) {saveOwners();} 
+		catch (ClassNotFoundException e) {e.printStackTrace();}
+		
+	}
+	
 	//Show
-	public String showOwnersReport(int type){
+	public String showOwnersReport(int type){//Call??//Cuando esta vacio lo muestro????
 		
 		String report="Duenos ordenados por ";
 		boolean okay=true;
@@ -54,7 +160,8 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 				lastNameSort();
 			break;
 			case 4:
-				
+				report+="fecha de nacimiento:";
+				birthdateSort();
 			break;
 			case 5:
 				report+="tipo de mascota favorita:";
@@ -78,71 +185,8 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 		
 	}
 	
-	//Adds
-	public String addOwner(String id, String name, String lastName, String birthdate, String favoritePetType){
-		
-		String message="Se ha agregado el dueno \""+name+"\".";
-		boolean exist=false;
-		
-		for(int i=0; (i<owners.size()) && !exist; i++){
-			if(owners.get(i).getId().equals(id)){
-				message="El dueno con id \""+id+"\" ya existe.";
-				exist=true;
-			}
-		}
-		
-		if(!exist){
-			owners.add(new Owner(id, name, lastName, birthdate, favoritePetType));
-			saveOwners();
-		}
-		
-		return message;
-		
-	}
-	
-	//Delete
-	public String deleteOwnerId(String id) {
-		String message="El dueno con id \""+id+"\" no existe.";
-		boolean found=false;
-		
-		for(int i=0; (i<owners.size()) && !found; i++){
-			if(owners.get(i).getId().equals(id)){
-				deleteOwnerFile(id);
-				owners.remove(i);
-				message="Eliminaste el dueno con id \""+id+"\".";
-				found=true;
-			}
-		}
-		
-		return message;
-	}
-	
-	public String deleteOwnerName(String name) {
-		String message="El dueno con nombre \""+name+"\" no existe.";
-		boolean found=false;
-		
-		for(int i=0; (i<owners.size()) && !found; i++){
-			if(owners.get(i).getName().equals(name)){
-				String id=owners.get(i).getId();
-				deleteOwnerFile(id);
-				owners.remove(i);
-				message="Eliminaste el dueno con nombre \""+name+"\".";
-				found=true;
-			}
-		}
-		
-		return message;
-	}
-	
-	private void deleteOwnerFile(String id){
-		
-		File file=new File("info/"+this.id+"/"+id+Owner.FILE_TYPE);
-		file.delete();
-		
-	}
-	
-	//Sorting
-	public void idSort(){
+	//Sort
+	private void idSort(){
 		
 		for(int i=0; i<owners.size(); i++){
 			for(int j=0; j<owners.size()-(i+1); j++){
@@ -156,7 +200,7 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 		
 	}
 	
-	public void nameSort(){
+	private void nameSort(){
 		
 		for(int i=0; i<owners.size(); i++){
 			for(int j=0; j<owners.size()-(i+1); j++){
@@ -170,7 +214,7 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 		
 	}
 	
-	public void lastNameSort(){
+	private void lastNameSort(){
 		
 		for(int i=0; i<owners.size(); i++){
 			for(int j=0; j<owners.size()-(i+1); j++){
@@ -184,7 +228,21 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 		
 	}
 	
-	public void favoritePetTypeSort(){
+	private void birthdateSort(){
+		
+		for(int i=0; i<owners.size(); i++){
+			for(int j=0; j<owners.size()-(i+1); j++){
+				if(owners.get(j+1).compareBirthdate(owners.get(j))<0){
+					Owner actual=owners.get(j);
+					owners.set(j, owners.get(j+1));
+					owners.set(j+1, actual);
+				}
+			}
+		}
+		
+	}
+	
+	private void favoritePetTypeSort(){
 		
 		for(int i=0; i<owners.size(); i++){
 			for(int j=0; j<owners.size()-(i+1); j++){
@@ -198,7 +256,7 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 		
 	}
 	
-	public void petQuantitySort(){
+	private void petQuantitySort(){
 		
 		for(int i=0; i<owners.size(); i++){
 			for(int j=0; j<owners.size()-(i+1); j++){
@@ -212,54 +270,6 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 		
 	}
 	
-	//Save
-	public void saveClub(){//Se puede hacer en un solo archivo
-		try{//Quito el try cacth (Nunca me va a dar error)
-			File folder=new File("info//"+id+"//");
-			folder.mkdir();
-			File file=new File("info/"+id+"/"+id+".txt");
-			PrintWriter writer=new PrintWriter(file);
-			writer.append(id+"\r\n"+name+"\r\n"+creationDate+"\r\n"+petType);
-			writer.close();
-		}
-		catch(FileNotFoundException e){
-			e.printStackTrace();
-		}
-	}
-	
-	public void saveOwners(){
-		try {
-			for(int i=0; i<owners.size(); i++){
-				FileOutputStream file=new FileOutputStream("info/"+id+"/"+owners.get(i).getId()+Owner.FILE_TYPE);
-				ObjectOutputStream creator=new ObjectOutputStream(file);
-				creator.writeObject(owners.get(i));
-				creator.close();
-			}
-		}
-		catch (FileNotFoundException e) {e.printStackTrace();}
-		catch (IOException e) {e.printStackTrace();}
-	}
-	
-	//Load
-	public void loadOwners(){
-		try{
-			File folder=new File("info/"+id+"/");
-			String[] owners=folder.list();
-			for(int i=0; i<owners.length; i++){
-				if(!owners[i].equals(id+".txt")){
-					FileInputStream owner=new FileInputStream("info/"+id+"/"+owners[i]);
-					ObjectInputStream creator=new ObjectInputStream(owner);
-					this.owners.add((Owner)creator.readObject());
-					creator.close();
-				}
-			}
-		}
-		catch(FileNotFoundException e){e.printStackTrace();} 
-		catch (IOException e) {e.printStackTrace();} 
-		catch (ClassNotFoundException e) {e.printStackTrace();}
-
-	}
-	
 	//Compare
 	public int compareTo(Club club) {//Id
 		
@@ -271,6 +281,13 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 	public int compare(Club club1, Club club2) {//Name
 		
 		int delta=club1.getName().compareTo(club2.getName());
+		return delta;
+		
+	}
+	
+	public int compareCreationDate(Club club){
+		
+		int delta=getCreationDate().compareTo(club.getCreationDate());
 		return delta;
 		
 	}
@@ -289,7 +306,7 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 		
 	}
 	
-	//Gets
+	//Get
 	public String getId(){
 		
 		return id;
@@ -308,16 +325,27 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 		
 	}
 	
+	public Date getCreationDate(){
+		
+		Date creationDate=null;
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		try {creationDate=format.parse(this.creationDate);}
+		catch (ParseException e) {e.printStackTrace();}
+		return creationDate;
+		
+	}
+	
 	public ArrayList<Owner> getOwners(){
 		
 		return owners;
 		
 	}
 	
-	//+
 	public String toString(){
+		
 		String toString="[id:"+id+" name:"+name+" creationDate:"+creationDate+" petType:"+petType+"]";
 		return toString;
+		
 	}
 	
 }

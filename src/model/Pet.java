@@ -1,7 +1,10 @@
 package model;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
+import java.util.Date;
 
 public class Pet implements Serializable, Comparable<Pet>, Comparator<Pet>{
 	
@@ -42,6 +45,13 @@ public class Pet implements Serializable, Comparable<Pet>, Comparator<Pet>{
 		
 	}
 	
+	public int compareBirthdate(Pet pet){
+		
+		int delta=getBirthdate().compareTo(pet.getBirthdate());
+		return delta;
+		
+	}
+	
 	public int compareGender(Pet pet){
 		
 		int delta=((int)gender)-((int)pet.getGender());
@@ -56,7 +66,7 @@ public class Pet implements Serializable, Comparable<Pet>, Comparator<Pet>{
 		
 	}
 	
-	//Gets
+	//Get
 	public String getId(){
 		
 		return id;
@@ -66,6 +76,15 @@ public class Pet implements Serializable, Comparable<Pet>, Comparator<Pet>{
 	public String getName(){
 		
 		return name;
+		
+	}
+	
+	public Date getBirthdate(){
+		
+		Date birthdate=null;
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		try {birthdate=format.parse(this.birthdate);} catch (ParseException e) {e.printStackTrace();}
+		return birthdate;
 		
 	}
 	
@@ -81,7 +100,6 @@ public class Pet implements Serializable, Comparable<Pet>, Comparator<Pet>{
 		
 	}
 	
-	//+
 	public String toString(){
 		
 		String toString="[id:"+id+" name:"+name+" birthdate:"+birthdate+" gender:";

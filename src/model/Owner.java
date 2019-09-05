@@ -1,14 +1,16 @@
 package model;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 
 public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>{
 	
 	//Constant
 	private static final long serialVersionUID = -4413223154133382615L;
-	public static final String FILE_TYPE=".ea";
 	
 	//Attributes
 	private String id;
@@ -32,7 +34,7 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 	}
 	
 	//Show
-	public String showPetsReport(int type){
+	public String showPetsReport(int type){//Call??//Cuando esta vacio lo muestro????
 		
 		String report="Mascotas ordenadas por ";
 		boolean okay=true;
@@ -46,7 +48,8 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 				nameSort();
 			break;
 			case 3:
-				
+				report+="fecha de nacimiento:";
+				birthdateSort();
 			break;
 			case 4:
 				report+="genero:";
@@ -70,7 +73,7 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 		
 	}
 	
-	//Adds
+	//Add
 	public String addPet(String id, String name, String birthdate, char gender, String type){
 		
 		String message="Se ha agregado la mascota \""+name+"\".";
@@ -82,7 +85,6 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 				exist=true;
 			}
 		}
-		
 		if(!exist){
 			pets.add(new Pet(id, name, birthdate, gender, type));
 		}
@@ -93,6 +95,7 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 	
 	//Delete
 	public String deletePetId(String id){
+		
 		String message="La mascota con id \""+id+"\" no existe.";
 		boolean found=false;
 		
@@ -105,9 +108,11 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 		}
 		
 		return message;
+		
 	}
 	
 	public String deletePetName(String name){
+		
 		String message="La mascota con nombre \""+name+"\" no existe.";
 		boolean found=false;
 		
@@ -120,10 +125,11 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 		}
 		
 		return message;
+		
 	}
 	
 	//Sorting
-	public void idSort(){
+	private void idSort(){
 		
 		for(int i=1; i<pets.size(); i++){
 			for(int j=i; (j>0)&&(pets.get(j-1).compareTo(pets.get(j))>0); j--){
@@ -135,7 +141,7 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 		
 	}
 	
-	public void nameSort(){
+	private void nameSort(){
 		
 		for(int i=1; i<pets.size(); i++){
 			for(int j=i; (j>0)&&(pets.get(j-1).compare(pets.get(j-1), pets.get(j))>0); j--){
@@ -147,7 +153,19 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 		
 	}
 	
-	public void genderSort(){
+	private void birthdateSort(){
+		
+		for(int i=1; i<pets.size(); i++){
+			for(int j=i; (j>0)&&(pets.get(j-1).compareBirthdate(pets.get(j))>0); j--){
+				Pet actual=pets.get(j);
+				pets.set(j, pets.get(j-1));
+				pets.set(j-1, actual);
+			}
+		}
+		
+	}
+	
+	private void genderSort(){
 		
 		for(int i=1; i<pets.size(); i++){
 			for(int j=i; (j>0)&&(pets.get(j-1).compareGender(pets.get(j))>0); j--){
@@ -159,7 +177,7 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 		
 	}
 	
-	public void typeSort(){
+	private void typeSort(){
 		
 		for(int i=1; i<pets.size(); i++){
 			for(int j=i; (j>0)&&(pets.get(j-1).compareType(pets.get(j))>0); j--){
@@ -193,6 +211,13 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 		
 	}
 	
+	public int compareBirthdate(Owner owner){
+		
+		int delta=getBirthdate().compareTo(owner.getBirthdate());
+		return delta;
+		
+	}
+	
 	public int compareFavoritePetType(Owner owner){
 		
 		int delta=favoritePetType.compareTo(owner.getFavoritePetType());
@@ -207,7 +232,7 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 		
 	}
 	
-	//Gets
+	//Get
 	public String getId(){
 		
 		return id;
@@ -226,6 +251,15 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 		
 	}
 	
+	public Date getBirthdate(){
+		
+		Date birthdate=null;
+		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+		try {birthdate=format.parse(this.birthdate);} catch (ParseException e) {e.printStackTrace();}
+		return birthdate;
+		
+	}
+	
 	public String getFavoritePetType(){
 		
 		return favoritePetType;
@@ -238,7 +272,6 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 		
 	}
 	
-	//+
 	public String toString(){
 		
 		String toString="[id:"+id+" name:"+name+" lastName:"+lastName+" birthdate:"+birthdate+" favoritePetType:"+favoritePetType+"]";
