@@ -1,10 +1,12 @@
 package model;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
-public class Pet implements Serializable{
+public class Pet implements Serializable, Comparable<Pet>, Comparator<Pet>{
 	
 	//Constants
+	private static final long serialVersionUID = -3133665233686332587L;
 	public static final char MALE='M';
 	public static final char FEMALE='F';
 	
@@ -26,10 +28,68 @@ public class Pet implements Serializable{
 		
 	}
 	
+	//Compare
+	public int compareTo(Pet pet) {//Id
+		
+		int delta=id.compareTo(pet.getId());
+		return delta;
+	}
+	
+	public int compare(Pet pet1, Pet pet2) {//Name
+		
+		int delta=pet1.getName().compareTo(pet2.getName());
+		return delta;
+		
+	}
+	
+	public int compareGender(Pet pet){
+		
+		int delta=((int)gender)-((int)pet.getGender());
+		return delta;
+		
+	}
+	
+	public int compareType(Pet pet){
+		
+		int delta=type.compareTo(pet.getType());
+		return delta;
+		
+	}
+	
 	//Gets
+	public String getId(){
+		
+		return id;
+		
+	}
+	
 	public String getName(){
 		
 		return name;
+		
+	}
+	
+	public char getGender(){
+		
+		return gender;
+		
+	}
+	
+	public String getType(){
+		
+		return type;
+		
+	}
+	
+	//+
+	public String toString(){
+		
+		String toString="[id:"+id+" name:"+name+" birthdate:"+birthdate+" gender:";
+		if(gender==MALE)toString+="Male";
+		else if(gender==FEMALE)toString+="Female";
+		else toString+="Undefined";
+		toString+=" type:"+type+"]";
+		return toString;
 		
 	}
 	
