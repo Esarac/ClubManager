@@ -12,11 +12,13 @@ public class ClubManager{
 	//Constants
 	public static final String FILE_TYPE=".al";
 	public static final String CLUBS_PATH="info/clubs.txt";
+	public static final String[] CLUBS_ORDER={"Disordered", "Id", "Name", "Creation Date", "Pet Type", "Owners Quantity"};
 	
 	//Attributes
 	private Club actualClub;
 	private Owner actualOwner;
 	private ArrayList<Club> clubs;
+	private String order;//Code
 	
 	//Constructor
 	public ClubManager(){
@@ -26,6 +28,8 @@ public class ClubManager{
 		
 		this.clubs=new ArrayList<Club>();
 		loadClubs();
+		
+		this.order=CLUBS_ORDER[0];
 		
 	}
 	
@@ -70,7 +74,7 @@ public class ClubManager{
 	}
 	
 	//Delete
-	private String deleteClubId(String id){
+	public String deleteClubId(String id){
 		
 		String message="El club con id \""+id+"\" no existe.";
 		boolean found=false;
@@ -88,7 +92,7 @@ public class ClubManager{
 		
 	}
 	
-	private String deleteClubName(String name){
+	public String deleteClubName(String name){
 		
 		String message="El club con nombre \""+name+"\" no existe.";
 		boolean found=false;
@@ -107,7 +111,9 @@ public class ClubManager{
 		
 	}
 	
-	private void deleteClubFile(String id){//[File]
+	private String deleteClubFile(String id){//[File]
+		
+		String message="Se pudo borrar el club del archivo.";
 		
 		try{
 			File clubs=new File(CLUBS_PATH);
@@ -133,7 +139,9 @@ public class ClubManager{
 			writer.append(newText);
 			writer.close();
 		}
-		catch(IOException e){e.printStackTrace();}
+		catch(IOException e){message="No se encontro el archivo.";}
+		
+		return message;
 		
 	}
 	
@@ -183,7 +191,9 @@ public class ClubManager{
 	}
 	
 	//Load
-	private void loadClubs(){//[File]
+	private String loadClubs(){//[File]
+		
+		String message="Se pudo cargar el club del archivo.";
 		
 		try{
 			String text=readClubs();
@@ -195,13 +205,15 @@ public class ClubManager{
 				}
 			}
 		}
-		catch(IOException e){e.printStackTrace();}
-		catch(IndexOutOfBoundsException e){e.printStackTrace();}
+		catch(IOException e){message="No se encontro el archivo.";}
+		catch(IndexOutOfBoundsException e){message="No se pudo cargar el club del archivo porque esta escrito de manera incorrecta.";}
 		
+		return message;
+	
 	}
 	
 	//Read
-	public static String readClubs() throws IOException{//[File]//Buena practica???
+	private String readClubs() throws IOException{//[File]
 		
 		File dir=new File("info//");
 		dir.mkdir();
@@ -220,32 +232,37 @@ public class ClubManager{
 	}
 	
 	//Show
-	public String showClubsReport(int type){//Call??//Cuando esta vacio lo muestro??
+	public String showClubsReport(int type){
 		
 		String report="Clubes ordenados por ";
 		boolean okay=true;
 		switch(type){
 			case 1:
 				report+="id:";
-				idSort();
+				if(!order.equals(CLUBS_ORDER[1]))
+					idSort();
 			break;
 			case 2:
 				report+="nombre:";
-				nameSort();
+				if(!order.equals(CLUBS_ORDER[2]))
+					nameSort();
 			break;
 			case 3:
 				
 				report+="fecha de creacion:";
-				creationDateSort();
+				if(!order.equals(CLUBS_ORDER[3]))
+					creationDateSort();
 				
 			break;
 			case 4:
 				report+="tipo de mascota:";
-				petTypeSort();
+				if(!order.equals(CLUBS_ORDER[4]))
+					petTypeSort();
 			break;
 			case 5:
 				report+="cantidad de duenos:";
-				ownerQuantitySort();
+				if(!order.equals(CLUBS_ORDER[5]))
+					ownerQuantitySort();
 			break;
 			default:
 				okay=false;
@@ -256,6 +273,9 @@ public class ClubManager{
 			for(int i=0; i<clubs.size(); i++){
 				report+="\n -"+clubs.get(i);
 			}
+		}
+		if(clubs.size()==0){
+			report+="\n No hay clubes.";
 		}
 		return report;
 		
@@ -274,13 +294,52 @@ public class ClubManager{
 		
 		String message;
 		try{message=actualOwner.showPetsReport(type);}
+		catch(NullPointerException e){message="No estas posicionado en un dueno.";System.out.println(actualOwner);}
+		return message;
+		
+	}
+	
+	public String showClubSearch(String info, int type){//[Call]
+		
+		String message="Tipo de busqueda invalido.";
+		switch(type){
+			case 1:
+				message=searchId(info);
+			break;
+			case 2:
+				message=searchName(info);
+			break;
+			case 3:
+				message=searchCreationDate(info);
+			break;
+			case 4:
+				message=searchPetType(info);
+			break;
+		}
+		return message;
+		
+	}
+	
+	public String showOwnerSearch(String info, int type){//[Call]
+		
+		String message;
+		try{message=actualClub.showOwnerSearch(info, type);}
+		catch(NullPointerException e){message="No estas posicionado en un club.";}
+		return message;
+		
+	}
+	
+	public String showPetSearch(String info, int type){//[Call]
+		
+		String message;
+		try{message=actualOwner.showPetSearch(info, type);}
 		catch(NullPointerException e){message="No estas posicionado en un dueno.";}
 		return message;
 		
 	}
 	
-	//Sort
-	private void idSort(){
+	//Sort (Selection)
+	public void idSort(){
 		
 		for(int i=0; i<clubs.size(); i++){
 			Club min=clubs.get(i);
@@ -295,10 +354,11 @@ public class ClubManager{
 			clubs.set(i, min);
 			clubs.set(minPos, actual);
 		}
+		this.order=CLUBS_ORDER[1];
 		
 	}
 	
-	private void nameSort(){
+	public void nameSort(){
 		
 		for(int i=0; i<clubs.size(); i++){
 			Club min=clubs.get(i);
@@ -313,10 +373,11 @@ public class ClubManager{
 			clubs.set(i, min);
 			clubs.set(minPos, actual);
 		}
+		this.order=CLUBS_ORDER[2];
 		
 	}
 	
-	private void creationDateSort(){
+	public void creationDateSort(){
 		
 		for(int i=0; i<clubs.size(); i++){
 			Club min=clubs.get(i);
@@ -331,10 +392,11 @@ public class ClubManager{
 			clubs.set(i, min);
 			clubs.set(minPos, actual);
 		}
+		this.order=CLUBS_ORDER[3];
 		
 	}
 	
-	private void petTypeSort(){
+	public void petTypeSort(){
 		
 		for(int i=0; i<clubs.size(); i++){
 			Club min=clubs.get(i);
@@ -349,10 +411,11 @@ public class ClubManager{
 			clubs.set(i, min);
 			clubs.set(minPos, actual);
 		}
+		this.order=CLUBS_ORDER[4];
 		
 	}
 	
-	private void ownerQuantitySort(){
+	public void ownerQuantitySort(){
 		
 		for(int i=0; i<clubs.size(); i++){
 			Club min=clubs.get(i);
@@ -367,6 +430,200 @@ public class ClubManager{
 			clubs.set(i, min);
 			clubs.set(minPos, actual);
 		}
+		this.order=CLUBS_ORDER[5];
+		
+	}
+	
+	//Search
+	public String searchId(String id){
+		
+		String message="";
+		Club testClub=new Club(id,"","1/1/1000","");
+		
+		//Binary
+		if(!order.equals(CLUBS_ORDER[1]))
+			idSort();
+		boolean foundB=false;
+		int start=0;
+		int end=clubs.size()-1;
+		long startTimeB=System.nanoTime();
+		while((start<=end) && !foundB){
+			int middle=(start+end)/2;
+			if(clubs.get(middle).compareTo(testClub)==0){
+				foundB=true;
+			}
+			else if(clubs.get(middle).compareTo(testClub)>0){
+				end=middle-1;
+			}
+			else{
+				start=middle+1;
+			}
+		}
+		long endTimeB=System.nanoTime();
+		long deltaTimeB=endTimeB-startTimeB;
+		//...
+		
+		//Sequential
+		boolean foundS=false;
+		long startTimeS=System.nanoTime();
+		for(int i=0; (i<clubs.size()) && !foundS; i++){
+			if(clubs.get(i).compareTo(testClub)==0){
+				foundS=true;
+			}
+		}
+		long endTimeS=System.nanoTime();
+		long deltaTimeS=endTimeS-startTimeS;
+		//...
+		
+		if(!foundB && !foundS)
+			message+="No ";
+		message+="Existe\n -Tiempo Binario:"+deltaTimeB+"ns\n -Tiempo Secuencial:"+deltaTimeS+"ns";
+		
+		return message;
+		
+	}
+	
+	public String searchName(String name){
+		
+		String message="";
+		Club testClub=new Club("",name,"1/1/1000","");
+		
+		//Binary
+		if(!order.equals(CLUBS_ORDER[2]))
+			nameSort();
+		boolean foundB=false;
+		int start=0;
+		int end=clubs.size()-1;
+		long startTimeB=System.nanoTime();
+		while((start<=end) && !foundB){
+			int middle=(start+end)/2;
+			if(clubs.get(middle).compare(clubs.get(middle),testClub)==0){
+				foundB=true;
+			}
+			else if(clubs.get(middle).compare(clubs.get(middle),testClub)>0){
+				end=middle-1;
+			}
+			else{
+				start=middle+1;
+			}
+		}
+		long endTimeB=System.nanoTime();
+		long deltaTimeB=endTimeB-startTimeB;
+		//...
+		
+		//Sequential
+		boolean foundS=false;
+		long startTimeS=System.nanoTime();
+		for(int i=0; (i<clubs.size()) && !foundS; i++){
+			if(clubs.get(i).compare(clubs.get(i),testClub)==0){
+				foundS=true;
+			}
+		}
+		long endTimeS=System.nanoTime();
+		long deltaTimeS=endTimeS-startTimeS;
+		//...
+		
+		if(!foundB && !foundS)
+			message+="No ";
+		message+="Existe\n -Tiempo Binario:"+deltaTimeB+"ns\n -Tiempo Secuencial:"+deltaTimeS+"ns";
+		
+		return message;
+		
+	}
+	
+	public String searchCreationDate(String creationDate){
+		
+		String message="";
+		Club testClub=new Club("","",creationDate,"");
+		
+		//Binary
+		if(!order.equals(CLUBS_ORDER[3]))
+			creationDateSort();
+		boolean foundB=false;
+		int start=0;
+		int end=clubs.size()-1;
+		long startTimeB=System.nanoTime();
+		while((start<=end) && !foundB){
+			int middle=(start+end)/2;
+			if(clubs.get(middle).compareCreationDate(testClub)==0){
+				foundB=true;
+			}
+			else if(clubs.get(middle).compareCreationDate(testClub)>0){
+				end=middle-1;
+			}
+			else{
+				start=middle+1;
+			}
+		}
+		long endTimeB=System.nanoTime();
+		long deltaTimeB=endTimeB-startTimeB;
+		//...
+		
+		//Sequential
+		boolean foundS=false;
+		long startTimeS=System.nanoTime();
+		for(int i=0; (i<clubs.size()) && !foundS; i++){
+			if(clubs.get(i).compareCreationDate(testClub)==0){
+				foundS=true;
+			}
+		}
+		long endTimeS=System.nanoTime();
+		long deltaTimeS=endTimeS-startTimeS;
+		//...
+		
+		if(!foundB && !foundS)
+			message+="No ";
+		message+="Existe\n -Tiempo Binario:"+deltaTimeB+"ns\n -Tiempo Secuencial:"+deltaTimeS+"ns";
+		
+		return message;
+		
+	}
+	
+	public String searchPetType(String petType){
+		
+		String message="";
+		Club testClub=new Club("","","1/1/1000",petType);
+		
+		//Binary
+		if(!order.equals(CLUBS_ORDER[4]))
+			petTypeSort();
+		boolean foundB=false;
+		int start=0;
+		int end=clubs.size()-1;
+		long startTimeB=System.nanoTime();
+		while((start<=end) && !foundB){
+			int middle=(start+end)/2;
+			if(clubs.get(middle).comparePetType(testClub)==0){
+				foundB=true;
+			}
+			else if(clubs.get(middle).comparePetType(testClub)>0){
+				end=middle-1;
+			}
+			else{
+				start=middle+1;
+			}
+		}
+		long endTimeB=System.nanoTime();
+		long deltaTimeB=endTimeB-startTimeB;
+		//...
+		
+		//Sequential
+		boolean foundS=false;
+		long startTimeS=System.nanoTime();
+		for(int i=0; (i<clubs.size()) && !foundS; i++){
+			if(clubs.get(i).comparePetType(testClub)==0){
+				foundS=true;
+			}
+		}
+		long endTimeS=System.nanoTime();
+		long deltaTimeS=endTimeS-startTimeS;
+		//...
+		
+		if(!foundB && !foundS)
+			message+="No ";
+		message+="Existe\n -Tiempo Binario:"+deltaTimeB+"ns\n -Tiempo Secuencial:"+deltaTimeS+"ns";
+		
+		return message;
 		
 	}
 	
@@ -392,24 +649,25 @@ public class ClubManager{
 	//Set
 	public String setActualClub(String id){
 		
-		idSort();
+		if(!order.equals(CLUBS_ORDER[1]))
+			idSort();
 		String message="El club con id \""+id+"\" no existe.";
 		boolean found=false;
 		int start=0;
 		int end=clubs.size()-1;
 		
 		while((start<=end) && !found){
-			int midle=(start+end)/2;
-			if(clubs.get(midle).getId().compareTo(id)==0){
-				this.actualClub=clubs.get(midle);
+			int middle=(start+end)/2;
+			if(clubs.get(middle).getId().compareTo(id)==0){
+				this.actualClub=clubs.get(middle);
 				message="Estas posicionado en el club con id \""+id+"\".";
 				found=true;
 			}
-			else if(clubs.get(midle).getId().compareTo(id)>0){
-				end=midle-1;
+			else if(clubs.get(middle).getId().compareTo(id)>0){
+				end=middle-1;
 			}
 			else{
-				start=midle+1;
+				start=middle+1;
 			}
 		}
 		
@@ -424,27 +682,29 @@ public class ClubManager{
 		
 	}
 	
-	public String setActualOwner(String id){//Este deberia repartirlo en las diferentes clases?
+	public String setActualOwner(String id){
 		
 		String message="El dueno con id \""+id+"\" no existe.";
 		try{
+			if(actualClub.getOrder().equals(Club.OWNERS_ORDER[1]))
+				actualClub.idSort();
 			ArrayList<Owner> owners=actualClub.getOwners();
 			boolean found=false;
 			int start=0;
 			int end=owners.size()-1;
 			
 			while((start<=end) && !found){
-				int midle=(start+end)/2;
-				if(owners.get(midle).getId().compareTo(id)==0){
-					this.actualOwner=owners.get(midle);
+				int middle=(start+end)/2;
+				if(owners.get(middle).getId().compareTo(id)==0){
+					this.actualOwner=owners.get(middle);
 					message="Estas posicionado en el dueno con id \""+id+"\".";
 					found=true;
 				}
-				else if(owners.get(midle).getId().compareTo(id)>0){
-					end=midle-1;
+				else if(owners.get(middle).getId().compareTo(id)>0){
+					end=middle-1;
 				}
 				else{
-					start=midle+1;
+					start=middle+1;
 				}
 			}
 		}
@@ -456,12 +716,26 @@ public class ClubManager{
 		
 	}
 	
-	public void setActualOwnerNull(){
+	public String setActualOwnerNull(){
+		
+		String message="Se guardaron los duenos y las mascotas en el archivo.";
 		
 		try{actualClub.saveOwners();}
-		catch(NullPointerException e){e.printStackTrace();}
+		catch(NullPointerException e){message="No estas posicionado en un club.";}
 		this.actualOwner=null;
 		
+		return message;
+		
 	}
+	
+	//Plus
+//	public String addOwner(Owner o){
+//		String message=actualClub.addOwner(o);
+//		return message;
+//	}
+//	
+//	public void saveOwner(){
+//		actualClub.saveOwners();
+//	}
 	
 }

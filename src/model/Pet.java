@@ -25,9 +25,28 @@ public class Pet implements Serializable, Comparable<Pet>, Comparator<Pet>{
 		
 		this.id=id;
 		this.name=name;
-		this.birthdate=birthdate;
-		this.gender=gender;
 		this.type=type;
+		
+		if(gender==MALE || gender==FEMALE)
+			this.gender=gender;
+		else{
+			try {throw new ImpossibleGenderException();}
+			catch (ImpossibleGenderException e) {
+				e.printStackTrace();
+				this.gender=FEMALE;
+			}
+		}
+		
+		String[] date=birthdate.split("/");
+		if(date.length==3)
+			this.birthdate=birthdate;
+		else{
+			try {throw new ImpossibleDateException();}
+			catch (ImpossibleDateException e) {
+				e.printStackTrace();
+				this.birthdate="1/1/1000";
+			}
+		}
 		
 	}
 	
@@ -83,7 +102,8 @@ public class Pet implements Serializable, Comparable<Pet>, Comparator<Pet>{
 		
 		Date birthdate=null;
 		SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-		try {birthdate=format.parse(this.birthdate);} catch (ParseException e) {e.printStackTrace();}
+		try {birthdate=format.parse(this.birthdate);}
+		catch (ParseException e) {birthdate=new Date();}
 		return birthdate;
 		
 	}

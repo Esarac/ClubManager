@@ -1,0 +1,10 @@
+A01,Donkey Kong,10/4/2019,Perro
+A03,Kirby,9/3/2019,Gato
+A05,Zelda,8/10/2018,Hamster
+A07,Yoshi Island,7/2/2018,Pajaro
+A09,Pokemon,6/12/2017,Tortuga
+A02,Undertale,5/1/2017,Pez
+A04,Mario Bros,4/9/2016,Lagarto
+A06,Earthbound,3/11/2016,Conejo
+A08,Sonic,2/8/2015,Caballo
+A10,Spyro,1/6/2015,Serpiente
