@@ -15,8 +15,8 @@ public class ClubManager{
 	public static final String[] CLUBS_ORDER={"Disordered", "Id", "Name", "Creation Date", "Pet Type", "Owners Quantity"};
 	
 	//Attributes
-	private Club actualClub;
-	private Owner actualOwner;
+	private Club actualClub;//Code
+	private Owner actualOwner;//Code
 	private ArrayList<Club> clubs;
 	private String order;//Code
 	
@@ -61,14 +61,21 @@ public class ClubManager{
 	
 	public String addOwner(String id, String name, String lastName, String birthdate, String favoritePetType){//[Call]
 		
-		String message=actualClub.addOwner(id, name, lastName, birthdate, favoritePetType);
+		String message="";
+		try{message=actualClub.addOwner(id, name, lastName, birthdate, favoritePetType);}
+		catch(NullPointerException e){message="No estas posicionado en un club.";}
 		return message;
 		
 	}
 	
 	public String addPet(String id, String name, String birthdate, char gender, String type){//[Call]
 		
-		String message=actualOwner.addPet(id, name, birthdate, gender, type);
+		String message="";
+		try{
+			message=actualOwner.addPet(id, name, birthdate, gender, type);
+			actualClub.saveOwners();
+		}
+		catch(NullPointerException e){message="No estas posicionado en un club o un dueno.";}
 		return message;
 		
 	}
@@ -163,14 +170,18 @@ public class ClubManager{
 	public String deleteOwner(String info, int type){//[Call]
 		
 		String message="Tipo de busqueda invalido.";
-		switch(type){
-			case 1:
-				message=actualClub.deleteOwnerId(info);
-			break;
-			case 2:
-				message=actualClub.deleteOwnerName(info);
-			break;
+		try{
+			switch(type){
+				case 1:
+					message=actualClub.deleteOwnerId(info);
+				break;
+				case 2:
+					message=actualClub.deleteOwnerName(info);
+				break;
+			}
+			
 		}
+		catch(NullPointerException e){message="No estas posicionado en un club.";}
 		return message;
 		
 	}
@@ -178,14 +189,20 @@ public class ClubManager{
 	public String deletePet(String info, int type){//[Call]
 		
 		String message="Tipo de busqueda invalido.";
-		switch(type){
-			case 1:
-				message=actualOwner.deletePetId(info);
-			break;
-			case 2:
-				message=actualOwner.deletePetName(info);
-			break;
+		try{
+			switch(type){
+				case 1:
+					message=actualOwner.deletePetId(info);
+					actualClub.saveOwners();
+				break;
+				case 2:
+					message=actualOwner.deletePetName(info);
+					actualClub.saveOwners();
+				break;
+			}
 		}
+		catch(NullPointerException e){message="No estas posicionado en un club o un dueno.";}
+		
 		return message;
 		
 	}
@@ -294,7 +311,7 @@ public class ClubManager{
 		
 		String message;
 		try{message=actualOwner.showPetsReport(type);}
-		catch(NullPointerException e){message="No estas posicionado en un dueno.";System.out.println(actualOwner);}
+		catch(NullPointerException e){message="No estas posicionado en un dueno.";}
 		return message;
 		
 	}

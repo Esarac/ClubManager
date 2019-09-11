@@ -679,10 +679,10 @@ public class Club implements Comparable<Club>, Comparator<Club>{
 	}
 	
 	//Plus
-//	public String addOwner(Owner o){
-//		String message="Se ha agregado el dueno \""+o.getName()+"\".";
-//		owners.add(o);
-//		return message;
-//	}
+	public String addOwner(Owner o){
+		String message="Se ha agregado el dueno \""+o.getName()+"\".";
+		owners.add(o);
+		return message;
+	}
 	
 }

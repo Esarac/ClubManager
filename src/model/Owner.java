@@ -478,7 +478,7 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 			message+="No ";
 		message+="Existe\n -Tiempo Binario:"+deltaTimeB+"ns\n -Tiempo Secuencial:"+deltaTimeS+"ns";
 		
-		return message;
+		return message; 
 		
 	}
 	
@@ -574,8 +574,10 @@ public class Owner implements Serializable, Comparable<Owner>, Comparator<Owner>
 	}
 	
 	//Plus
-//	public void addPet(Pet p){
-//		pets.add(p);
-//	}
+	public void addPet(Pet p){
+		
+		pets.add(p);
+		
+	}
 	
 }
