@@ -745,7 +745,20 @@ public class ClubManager{
 		
 	}
 	
+	//Get
+	public ArrayList<Club> getClubs(){
+		
+		return clubs;
+		
+	}
+	
 	//Plus
+	public void addClub(Club c){
+		
+		clubs.add(c);
+		
+	}
+	
 //	public String addOwner(Owner o){
 //		String message=actualClub.addOwner(o);
 //		return message;

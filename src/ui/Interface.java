@@ -484,27 +484,25 @@ public class Interface {
 	
 	//Plus
 //	private void dataGenerator(){
-//		String[] nombres={"Esteban","Alejandro","Carlos","Guillermo","John","Jose Daniel","Juan Andres","Juan Felipe","Juan Jose","Juan Sebastian","Santiago","Joshua","Nicolas","Isabella","Natalia","Sofia","Maria Jose","Tatiana","Andrea","Mariana","Catalina","Maria Fernanda","Valeria","Gabriela","Diana","Valentina"};
-//		String[] apellidos={"Ariza","Valencia","Mira","Quevedo","Mendoza","Zamudio","Sanchez","Gonzales","Arenas","Serpa","Barriga","Lasciche","Corredor","Villamil","Giraldo","Soto","Losada","Betancur","Munos","Quintero","Restrepo","Lopez","Cardenas","Benavides","Acosta","Ramirez"};
-//		String[] animales={"Perro","Gato","Hamster","Pajaro","Tortuga","Pez","Lagarto","Conejo","Serpiente","Cerdo","Ardilla","Erizo","Huron"};
+//		String[] nombres={"Alejandro","Alvaro","Andres","Agustin","Beto","Carlos","Cristian","Camilo","David","Daniel","Diego","Esteban","Ernesto","Fernando","Felipe","Francisco","Geronimo","Gonzalo","Gabriel","Guillermo","Hernan","Isaac","Jaime","John","Johan","Joshua","Jose Daniel","Juan Andres","Juan Felipe","Juan Jose","Juan Sebastian","Luis","Mateo","Mario","Miguel","Mauricio","Nicolas","Nestor","Santiago","Samuel","Sergio","Tomas","Rodrigo","Victor","Alejandra","Andrea","Ana","Angela","Antonia","Catalina","Carolina","Cristina","Camila","Danna","Daniela","Dorian","Diana","Estefania","Gabriela","Isabella","Juliana","Juana","Karen","Laura","Laura Sofia","Lucia","Marcela","Maria Jose","Maria Fernanda","Mariana","Manuela","Michele","Natalia","Paula","Patricia","Sara","Sofia","Sandra","Tatiana","Valeria","Valentina","Victoria"};
+//		String[] apellidos={"Ariza","Arenas","Acosta","Afanador","Barriga","Bustamante","Betancur","Benavides","Cabrera","Cadena","Cardenas","Corredor","Contreras","Dominguez","Duque","Espinosa","Escobar","Fernandez","Flores","Fiat","Gonzales","Giraldo","Guerrero","Garzon","Hernandez","Herrera","Ibarra","Juarez","Jaramillo","Lasciche","Lopez","Losada","Lara","Mira","Munos","Martinez","Mendoza","Matamoros","Nunes","Navarro","Nadal","Otero","Ortega","Puentes","Plata","Pizarro","Quintero","Ossa","Quevedo","Restrepo","Ramirez","Roldan","Satizabal","Sanchez","Serpa","Saenz","Soto","Uribe","Tabares","Tobon","Toro","Tejada","Umana","Uribe","Valencia","Villamil","Valdes","Vaca","Yuriko","Yusunguaira","Zamudio","Zapata"};
+//		String[] animales={"Ardilla","Arana","Cangrejo","Conejo","Caballo","Cerdo","Erizo","Gato","Huron","Hormiga","Hamster","Lagarto","Perro","Pajaro","Pez","Raton","Rana","Serpiente","Tortuga","Vaca"};
 //		for(int j=1; j<=10; j++){
 //			String codigo="A";
 //			if(j!=10)codigo+="0"+j;
 //			else codigo+="10";
 //			System.out.println(manager.setActualClub(codigo));
-//			for(int i=0; i<=10000;i++){
-//				int id=(100000*j)+i;
+//			for(int i=1; i<=100000;i++){
+//				int id=(1000000*j)+i;
 //				int name=(int)(Math.random()*nombres.length);
 //				int apellido=(int)(Math.random()*apellidos.length);
 //				int dia=(int)(Math.random()*31)+1;
 //				int mes=(int)(Math.random()*12)+1;
-//				int ano=(int)((Math.random()*20)+2000);
+//				int ano=(int)((Math.random()*20)+1985);
 //				int animal=(int)(Math.random()*animales.length);
 //				Owner o=new Owner(id+"", nombres[name], apellidos[apellido], dia+"/"+mes+"/"+ano, animales[animal]);
-//				Pet p1=new Pet("1", "Bruno", "20/3/2012", 'M', "Perro");
+//				Pet p1=new Pet("1", "Bruno", "1/5/2016", 'F', animales[animal]);
 //				o.addPet(p1);
-//				Pet p2=new Pet("2", "Impa", "1/5/2016", 'F', animales[animal]);
-//				o.addPet(p2);
 //				System.out.println(manager.addOwner(o));
 //			}
 //			manager.saveOwner();
